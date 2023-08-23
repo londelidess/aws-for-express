@@ -11,12 +11,13 @@ function SignupFormModal() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState([]);
   const { closeModal } = useModal();
+  const [image, setImage] = useState(null);
 
   const handleSubmit = e => {
     e.preventDefault();
     if (password === confirmPassword) {
       setErrors([]);
-      return dispatch(sessionActions.signup({ username, password }))
+      return dispatch(sessionActions.signup({ username, password,image }))
         .then(closeModal)
         .catch(async (res) => {
           const data = await res.json();
@@ -24,6 +25,11 @@ function SignupFormModal() {
         });
     }
     return setErrors(['Confirm Password field must be the same as the Password field']);
+  };
+
+  const updateFile = e => {
+    const file = e.target.files[0];
+    if (file) setImage(file);
   };
 
   return (
@@ -59,6 +65,10 @@ function SignupFormModal() {
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
           />
+        </label>
+        <label>
+          Avatar
+          <input type="file" onChange={updateFile} />
         </label>
         <button type="submit">Sign Up</button>
       </form>

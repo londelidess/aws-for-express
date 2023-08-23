@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useModal } from "../../context/Modal";
-import { uploadImages } from "../../store/images";
+import { uploadImages,fetchImages } from "../../store/images";
 
 function ImageUploadModal({ userId }) {
   const [errors, setErrors] = useState([]);
@@ -17,11 +17,20 @@ function ImageUploadModal({ userId }) {
     }
     setErrors([]);
     const res = await dispatch(uploadImages(images, userId));
-    if (res.ok) closeModal();
+    if (res.ok)
+    {
+    closeModal();
+    dispatch(fetchImages(userId));
+    }
     else {
       const data = await res.json();
       if (data?.errors) setErrors(data.errors);
     }
+  };
+
+  const updateFiles = e => {
+    const files = e.target.files;
+    setImages(files);
   };
 
   return (
@@ -31,6 +40,14 @@ function ImageUploadModal({ userId }) {
         <ul>
           {errors.map((error) => <li key={error}>{error}</li>)}
         </ul>
+        <label>
+          Images to Upload
+          <input
+            type="file"
+            accept=".jpg, .jpeg, .png"
+            multiple
+            onChange={updateFiles} />
+        </label>
         <button type="submit">Upload!</button>
       </form>
     </>

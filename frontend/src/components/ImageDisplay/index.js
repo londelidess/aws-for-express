@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchImages } from "../../store/images";
+import { fetchImages,deleteImage } from "../../store/images";
 import OpenModalButton from "../OpenModalButton";
 import ImageUploadModal from "./ImageUploadModal";
 import "./ImageDisplay.css";
@@ -12,14 +12,27 @@ function ImageDisplay() {
 
   useEffect(() => {
     if (!sessionUser) return;
-    dispatch(fetchImages(sessionUser.id));
+    dispatch(fetchImages(sessionUser.id))
   }, [dispatch, sessionUser]);
-  
+
   if (!sessionUser) return null;
 
-  const display = imageUrls?.map(imageUrl => {
-    return <img className="image" key={imageUrl} src={imageUrl} alt="" />
-  });
+const handleDelete = async (imageId) => {
+  const result = await dispatch(deleteImage(imageId));
+  if (result) {
+    dispatch(fetchImages(sessionUser.id));
+  }
+};
+
+    const display = imageUrls?.map(imageData => {
+      // console.log(imageData)
+      return (
+          <div className="image-container" key={imageData.id}>
+              <img className="image" src={imageData.url} alt="" />
+              <button onClick={() => handleDelete(imageData.id)}>Delete</button>
+          </div>
+      );
+    });
 
   return (
     <div className="image-display">
@@ -34,5 +47,4 @@ function ImageDisplay() {
     </div>
   );
 }
-
 export default ImageDisplay;
